@@ -38,6 +38,7 @@ android {
     buildFeatures {
         compose = true
     }
+
 }
 
 dependencies {
@@ -65,4 +66,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(project(":kotlin-tools"))
+
+
 }
