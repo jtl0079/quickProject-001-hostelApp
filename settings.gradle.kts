@@ -21,4 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "MiniProject"
 include(":app")
- 
+
+include(":kotlin-tools")
+project(":kotlin-tools").projectDir = file("libs/kotlin-tools")

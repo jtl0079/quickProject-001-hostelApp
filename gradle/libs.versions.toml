@@ -14,6 +14,7 @@ materialIconsExtended = "1.7.8"
 navigationCompose = "2.9.6"
 firebaseBom = "34.6.0"
 firebaseAuthKtx = "23.2.1"
+androidxComposeBom = "2025.11.01"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -36,6 +37,7 @@ androidx-material-icons-extended = { group = "androidx.compose.material", name =
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
+androidx-compose-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
