@@ -25,12 +25,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.miniproject.kotlinTools.Composable.FirebaseDefaultLoginComponent
-import com.example.miniproject.kotlinTools.Composable.TimePicker
 import com.example.miniproject.ui.theme.MiniProjectTheme
-import com.example.project.kotlinTools.PieChart
-import com.example.project.kotlinTools.RawData
 import com.myorg.kotlintools.composable.RawData
+import com.myorg.kotlintools.composable.TimePicker
 
 
 class MainActivity : ComponentActivity() {
