@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.miniproject.ui.theme.MiniProjectTheme
+import com.google.firebase.auth.FirebaseAuth
 import com.myorg.kotlintools.MonthlyReport
 import com.myorg.kotlintools.MonthlyReportOf
 import com.myorg.kotlintools.VibrateUtils
@@ -47,18 +48,11 @@ class MainActivity : ComponentActivity() {
             MiniProjectTheme {
 
                 val context = LocalContext.current
-                val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-
-                vibrator.vibrate(
-                    VibrationEffect.createOneShot(
-                        2000, // 毫秒
-                        VibrationEffect.DEFAULT_AMPLITUDE
-                    )
-                )
-
 
                 val report = remember { MonthlyReportOf<Int>() }
                 var version by remember { mutableIntStateOf(0) }
+                var user by remember{ mutableStateOf(FirebaseAuth.getInstance().currentUser.toString()) }
+
 
                 Column {
                     DatePickerOutlinedButton()
@@ -70,9 +64,11 @@ class MainActivity : ComponentActivity() {
                         VibrateUtils.vibrate(context, 1000)
                     }) {
                         Text(
-                            text = "${report.getSumOfKey("A").toString()} $version"
+                            text = "${report.getSumOfKey("A").toString()} $version ${user}"
                         )
                     }
+                    FirebaseDefaultLoginComponent()
+
                 }
 
 
