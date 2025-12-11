@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "871113940782",
+    "project_id": "hostel-35ae5",
+    "storage_bucket": "hostel-35ae5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:871113940782:android:8d455b64be99a8b28ee4bf",
+        "android_client_info": {
+          "package_name": "com.example.hostelmanagement"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "871113940782-e9nfn5mnbmfrhlq1j0asgclv5pcg91jd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.hostelmanagement",
+            "certificate_hash": "a5809dfcbdcd03e3e034957ffe4427780fc240af"
+          }
+        },
+        {
+          "client_id": "871113940782-g0m4ej4n6grls7t3hd9tlodb731vfadt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4lR1p17utEYcqQ0UJzsK3Z7ZuFUHcPO4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "871113940782-g0m4ej4n6grls7t3hd9tlodb731vfadt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

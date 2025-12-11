@@ -1,0 +1,3 @@
+[submodule "libs/kotlin-tools"]
+	path = libs/kotlin-tools
+	url = https://github.com/jtl0079/kotlin-tools
