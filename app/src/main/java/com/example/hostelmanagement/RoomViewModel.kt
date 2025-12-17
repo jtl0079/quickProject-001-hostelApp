@@ -1,4 +1,5 @@
 package com.example.hostelmanagement
+
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,31 +14,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import kotlin.collections.emptyList
-import kotlin.collections.indexOfFirst
-import kotlin.collections.lastOrNull
-import kotlin.collections.map
-import kotlin.collections.sortedBy
-import kotlin.collections.toMutableList
-import kotlin.text.format
-import kotlin.text.ifBlank
-import kotlin.text.isBlank
-import kotlin.text.split
-import kotlin.text.trim
 
 class RoomViewModel(
-    private val firestore: FirebaseFirestore= FirebaseFirestore.getInstance(),
-    private val auth: FirebaseAuth =FirebaseAuth.getInstance(),
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val storageRepo: StorageRepository = StorageRepository()
-): ViewModel() {
+) : ViewModel() {
     private val _roomsState = MutableStateFlow<List<RoomItem>>(emptyList())
     val roomsState: StateFlow<List<RoomItem>> = _roomsState.asStateFlow()
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading.asStateFlow()
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
-    private var roomsListener: ListenerRegistration?=null
-    private var currentObservedHostelId:String?=null
+    private var roomsListener: ListenerRegistration? = null
+    private var currentObservedHostelId: String? = null
 
     suspend fun addRoomWithDetails(
         hostelId: String,
@@ -60,16 +50,16 @@ class RoomViewModel(
 
         try {
             var safeHostelName = hostelName.ifBlank { "" }
-            if(safeHostelName.isBlank()) {
-                val hostelDoc=firestore.collection("Branch")
+            if (safeHostelName.isBlank()) {
+                val hostelDoc = firestore.collection("Branch")
                     .document(uid)
                     .collection("Hostel")
                     .document(safeHostelId)
                     .get()
                     .await()
-                safeHostelName=hostelDoc.getString("hostelName")?:safeHostelId
+                safeHostelName = hostelDoc.getString("hostelName") ?: safeHostelId
             }
-            val prefix= RoomIdUtils.createPrefix(safeHostelName)
+            val prefix = RoomIdUtils.createPrefix(safeHostelName)
 
             val roomsCollection = firestore.collection("Branch")
                 .document(uid)
@@ -118,7 +108,7 @@ class RoomViewModel(
                     roomDescription = roomDescription,
                     createdAt = roomMap["createdAt"] as Timestamp,
                     roomStatus = "Available",//
-                    hostelId= safeHostelId//
+                    hostelId = safeHostelId//
                 )
                 val updatedList = _roomsState.value.toMutableList()
                 updatedList.add(newItem)
@@ -131,20 +121,20 @@ class RoomViewModel(
     }
 
 
-    fun observeRooms(hostelId:String){
-        val uid= auth.currentUser?.uid ?:return
+    fun observeRooms(hostelId: String) {
+        val uid = auth.currentUser?.uid ?: return
         val safeHostelId = hostelId
             .trim()
             .trim('/')
             .split('/')
-            .lastOrNull() ?:return
+            .lastOrNull() ?: return
 
-        if(roomsListener!=null&&currentObservedHostelId==safeHostelId) {
+        if (roomsListener != null && currentObservedHostelId == safeHostelId) {
             return
         }
         roomsListener?.remove()
-        roomsListener=null
-        currentObservedHostelId=safeHostelId
+        roomsListener = null
+        currentObservedHostelId = safeHostelId
 
         val coll = firestore.collection("Branch")
             .document(uid)
@@ -152,16 +142,16 @@ class RoomViewModel(
             .document(safeHostelId)
             .collection("rooms")
 
-        _loading.value=true
-        _error.value=null
+        _loading.value = true
+        _error.value = null
 
-        roomsListener=coll.addSnapshotListener { snaps,e ->
-            if (e!=null){
-                _error.value=e.message
-                _loading.value=false
+        roomsListener = coll.addSnapshotListener { snaps, e ->
+            if (e != null) {
+                _error.value = e.message
+                _loading.value = false
                 return@addSnapshotListener
             }
-            if (snaps!=null) {
+            if (snaps != null) {
                 val list = snaps.documents.map { d ->
                     RoomItem(
                         roomId = d.getString("roomId") ?: d.id,
@@ -174,13 +164,14 @@ class RoomViewModel(
                     )
                 }.sortedBy { it.roomId }
                 _roomsState.value = list
-            }else{
-                _roomsState.value= emptyList()
+            } else {
+                _roomsState.value = emptyList()
             }
-            _loading.value=false
+            _loading.value = false
         }
     }
-    suspend fun loadRoomsOnce(hostelId:String):List<RoomItem> = withContext(Dispatchers.IO) {
+
+    suspend fun loadRoomsOnce(hostelId: String): List<RoomItem> = withContext(Dispatchers.IO) {
         val uid = auth.currentUser?.uid ?: throw kotlin.IllegalStateException("User not logged in")
         val safeHostelId = hostelId
             .trim()
@@ -213,6 +204,7 @@ class RoomViewModel(
         }
         list
     }
+
     fun updateRoom(
         hostelId: String,
         roomId: String,
@@ -253,7 +245,7 @@ class RoomViewModel(
         roomId: String,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
-    ){
+    ) {
         val uid = auth.currentUser?.uid ?: return onError("User not logged in")
 
         val safeHostelId = hostelId.trim().trim('/').split('/').lastOrNull()
@@ -269,11 +261,11 @@ class RoomViewModel(
                     .document(roomId)
                 docRef.delete().await()
 
-                val current=_roomsState.value.toMutableList()
-                val index=current.indexOfFirst { it.roomId==roomId }
-                if(index!=-1){
+                val current = _roomsState.value.toMutableList()
+                val index = current.indexOfFirst { it.roomId == roomId }
+                if (index != -1) {
                     current.removeAt(index)
-                    _roomsState.value=current
+                    _roomsState.value = current
                 }
                 onSuccess()
             } catch (e: Exception) {
@@ -286,7 +278,7 @@ class RoomViewModel(
     override fun onCleared() {
         super.onCleared()
         roomsListener?.remove()
-        roomsListener=null
-        currentObservedHostelId=null
+        roomsListener = null
+        currentObservedHostelId = null
     }
 }

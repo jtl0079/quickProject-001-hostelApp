@@ -33,16 +33,17 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_20
+        targetCompatibility = JavaVersion.VERSION_20
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "20"
     }
     buildFeatures {
         compose = true
     }
 }
+
 dependencies {
 
     implementation(libs.androidx.room.runtime)
@@ -93,6 +94,9 @@ dependencies {
     implementation(project(":kotlin-tools:tools_android"))
     implementation(project(":kotlin-tools:tools_core"))
 
+    implementation("com.google.dagger:hilt-android:2.51")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    kapt("com.google.dagger:hilt-compiler:2.51")
 
 
 

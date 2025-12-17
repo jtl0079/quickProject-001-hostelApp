@@ -1,7 +1,10 @@
 package com.example.hostelmanagement.report.domain.model
 
+import androidx.compose.ui.unit.IntSize
 import com.myorg.kotlintools.time.domain.model.alltime.AllTimeDataBundle
+import com.myorg.kotlintools.time.domain.model.instant.InstantlyEntries
 import com.myorg.kotlintools.time.domain.model.instant.InstantlyEntry
+import com.myorg.kotlintools.valueOperatorOf
 import java.time.Instant
 
 /*
@@ -22,18 +25,21 @@ data = {
 branchId : BH000001
 */
 data class HostelReport(
-    val reportId: String,
-    val reportName: String,
-    val periodStartDate: Instant,
-    val periodEndDate: Instant,
-    val frequency: String,      // monthly, yearly
-    val target: String,         // occupancy, income, maintenance
-    val data: AllTimeDataBundle<String, Double>,
-    val branchId: String
+    val reportId: String = "",
+    val reportName: String = "",
+    val periodStartDate: Instant = Instant.now(),
+    val periodEndDate: Instant = Instant.now(),
+    val frequency: String ="month",      // month, year
+    val target: String = "occupancy",         // occupancy, income, maintenance
+    val data: AllTimeDataBundle<String, Double> = AllTimeDataBundle(timeEntries = InstantlyEntries(valueOperator = valueOperatorOf<Double>())),
+    val branchId: String = ""
 )
 
 fun DemoHostelReport(): HostelReport {
-    val data = AllTimeDataBundle<String, Double>()
+    val data =
+        AllTimeDataBundle<String, Double>(
+            timeEntries = InstantlyEntries(valueOperator = valueOperatorOf<Double>())
+        )
 
     data.timeEntries.entries.add(
         InstantlyEntry("table", Instant.now(), 1234.0)

@@ -157,8 +157,8 @@ fun BookingHistoryScreen(navController: NavController,bookingHistoryViewModel: B
                 modifier = Modifier.fillMaxSize()
             ){page ->
                 when(page){
-                    0 -> History(navController,bookingHistoryViewModel,completeList,snackbarHostState, scope)
-                    1 -> History(navController,bookingHistoryViewModel,cancelList,snackbarHostState,scope)
+                    0 -> History(0,navController,bookingHistoryViewModel,completeList,snackbarHostState, scope)
+                    1 -> History(1,navController,bookingHistoryViewModel,cancelList,snackbarHostState,scope)
                 }
 
             }
@@ -178,7 +178,7 @@ fun BookingHistoryScreen(navController: NavController,bookingHistoryViewModel: B
 }
 
 @Composable
-fun History(navController: NavController, bookingHistoryViewModel: BookingHistoryViewModel,
+fun History(selection:Int,navController: NavController, bookingHistoryViewModel: BookingHistoryViewModel,
             bookingList:List<BookingEntity>,snackbarHostState: SnackbarHostState,
             scope: CoroutineScope
 ){
@@ -235,16 +235,173 @@ fun History(navController: NavController, bookingHistoryViewModel: BookingHistor
             }
         }
         if(selectedId != null){//to control the pop up maintenance details
-            BookingDetails(
-                bookingId = selectedId!!,
-                onDismiss = {selectedId = null},//close the pop up
-                bookingList = bookingList,
-                bookingHistoryViewModel,
-                snackbarHostState,
-                scope
-            )
+            if(selection == 0){
+                BookingDetails(
+                    bookingId = selectedId!!,
+                    onDismiss = {selectedId = null},//close the pop up
+                    bookingList = bookingList,
+                    bookingHistoryViewModel,
+                    snackbarHostState,
+                    scope
+                )
+            }
+            else{
+                CancelDetails(
+                    bookingId = selectedId!!,
+                    onDismiss = {selectedId = null},//close the pop up
+                    bookingList = bookingList,
+                    bookingHistoryViewModel,
+                    snackbarHostState,
+                    scope
+                )
+            }
         }
     }
+}
+
+@Composable
+fun CancelDetails(
+    bookingId: String,
+    onDismiss: () -> Unit,
+    bookingList: List<BookingEntity>,
+    viewModel: BookingHistoryViewModel,
+    snackbarHostState: SnackbarHostState,
+    scope: CoroutineScope
+){
+    val bookingList = bookingList
+    val tenantViewModel : TenantInformationViewModel = viewModel()
+    val allTenantRecord = tenantViewModel.tenant
+    var tenantRecord: TenantEntity = TenantEntity()
+    val bookingDetails = bookingList.find({it.bookingId == bookingId})
+    var show by remember{ mutableStateOf(false)}
+
+    LaunchedEffect(Unit){
+        show = true
+        if (bookingDetails != null && !bookingDetails.roomId.isNullOrBlank()) {
+            viewModel.fetchRoomInfo(bookingDetails.roomId)
+        }
+    }
+    val uiState by viewModel.uiState.collectAsState()
+    val room = uiState.selectedRoom
+    val isLoading by viewModel.loading.collectAsState(initial = false)
+    Log.d("RoomDebug", "error space: ${room?.roomPrice}")
+    val alpha by animateFloatAsState(//control the transparency of the pop up
+        targetValue = if(bookingDetails != null && show) 1f else 0f,//if maintenance details are not null will be show
+        animationSpec = tween(500)//in the 200ms will show the pop up
+    )
+    //animateFloatAsState = calculates animation values per frame
+    //animateFloatAsState calculates the current animation value, and compose uses that value to redraw the Ui for each frame
+
+    val scale by animateFloatAsState(//control the size of the pop up
+        targetValue = if(bookingDetails != null && show) 1f else 0.5f,//if the maintenance details is not null will be show the target size
+        animationSpec = tween(500)//in the 200ms will from small to big
+    )
+    for(tenant in allTenantRecord){
+        if(tenant.tenantId == bookingDetails?.tenantId){
+            tenantRecord = tenant
+        }
+    }
+    Box(//to cover the Big Box and show the pop up so the color is black transparent (dim background)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.4f* alpha))//follow the animation become dim background
+            .clickable(
+                indication = null,
+                interactionSource = remember {MutableInteractionSource()}
+            ){
+                onDismiss()
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Box(//this is the pop up that show the maintenance details
+            modifier = Modifier
+                .scale(scale)
+                .alpha(alpha)
+                .size(360.dp, 500.dp)
+                .background(Color.White)
+                .border(2.dp, Color.Black)
+                .clickable(enabled = false){},
+            contentAlignment = Alignment.TopCenter
+        ){
+            Column(
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                Text(
+                    text = "Booking ID : ${bookingDetails?.bookingId}",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(8.dp)
+
+                )
+                CardInformation("Tenant ID", bookingDetails?.tenantId?:"")
+
+                CardInformation("Name", tenantRecord.tenantName)
+
+                CardInformation("Email", tenantRecord.tenantEmail)
+
+                CardInformation("Phone Number", tenantRecord.tenantPhoneNumber)
+                Divider(Modifier.padding(vertical = 2.dp))
+
+                //Spacer(modifier = Modifier.height(8.dp))
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                    ,
+                    colors = CardDefaults.cardColors(
+                        containerColor =Color(0xFFCCF1F2)
+                    ),
+                    shape = RoundedCornerShape(16.dp)
+                ){
+                    CardInformation("Room ID", bookingDetails?.roomId?: "")
+
+                    val typeDisplay = when {
+                        isLoading -> "Loading..."
+                        room?.roomType != null -> {
+                            String.format(room.roomType)
+                        }
+                        else -> "N/A"
+                    }
+                    CardInformation("Type", typeDisplay)
+
+                    val capacityDisplay = when {
+                        isLoading -> "Loading..."
+                        room?.roomCapacity != null -> {
+                            String.format("${room.roomCapacity} Person")
+                        }
+                        else -> "N/A"
+                    }
+                    CardInformation("Capacity", capacityDisplay)
+
+                    val priceDisplay = when {
+                        isLoading -> "Loading..."
+                        room?.roomPrice != null -> {
+                            String.format("RM %.2f", room.roomPrice)
+                        }
+                        else -> "N/A"
+                    }
+                    CardInformation("Price", priceDisplay)
+
+                    val hostelDisplay = when {
+                        isLoading -> "Loading..."
+                        room?.roomPrice != null -> {
+                            String.format(room.hostelId?:"N/A")
+                        }
+                        else -> "N/A"
+                    }
+                    CardInformation("Hostel ID", hostelDisplay)
+
+
+                }
+
+            }
+        }
+
+    }
+
 }
 
 @Composable

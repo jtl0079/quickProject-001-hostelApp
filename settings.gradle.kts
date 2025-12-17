@@ -19,6 +19,12 @@ dependencyResolutionManagement {
     }
 }
 
+
+
+
+
+
+
 rootProject.name = "hostel management"
 include(":app")
 

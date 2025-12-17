@@ -130,7 +130,7 @@ class BookingRoomViewModel(
 
     fun onFilterButtonClicked(sem: String, durationYear: String,durationMonth:String) {
         if (sem.isBlank()) {
-            setError("Please select a semester")
+            setError("Please select a Month Check-in")
             return
         }
         if (durationYear.isBlank() && durationMonth.isBlank()) {

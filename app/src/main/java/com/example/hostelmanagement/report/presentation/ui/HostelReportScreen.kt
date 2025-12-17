@@ -1,9 +1,14 @@
 package com.example.hostelmanagement.report.presentation.ui
 
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -11,66 +16,90 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.example.hostelmanagement.booking.bookingHostel.FourButton
+import com.example.hostelmanagement.report.infrastructure.dto.mapper.toPieChartDataList
+import com.example.hostelmanagement.report.presentation.viewmodel.HostelReportViewModel
 import com.myorg.kotlintools.android.ui.chart.PieChart
-import com.myorg.kotlintools.android.ui.chart.RawData
+import com.myorg.kotlintools.android.ui.chart.PieChartData
 import com.myorg.kotlintools.android.ui.selection.YearMonthRangeSelector
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HostelReportScreen(){
+fun HostelReportScreen(
+    navController: NavController,
+    viewModel: HostelReportViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    val options = listOf(
+        "Room Occupancy Rate",
+        "Hostel Occupancy Rate"
+    )
+
+    val pieData = remember(
+        uiState.reports,
+        uiState.frequency,
+        uiState.loading,
+    ) {
+        Log.d("PIEDATA", "${uiState.reports}")
+
+        if (uiState.loading) {
+            emptyList()
+        } else {
+            Log.d("PIEDATA", "${uiState.reports.data.keyTimeMap}")
+            uiState.reports
+                .data
+                .keyTimeMap
+                .toPieChartDataList(
+                    frequency = uiState.frequency
+                )
+        }
+    }
 
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf("选择一个选项") }
 
-    val options = listOf("Each hostel occupancy rate", "Banana", "Orange")
-
-    val data by remember { mutableStateOf(listOf<RawData>(
-        RawData("餐饮", 1200.0),
-        RawData("交通", 800.0),
-        RawData("娱乐", 600.0),
-        RawData("购物", 1500.0),
-        RawData("房租", 3000.0),
-        RawData("电子产品", 900.0),
-        RawData("bathroom ", 900.0),
-        RawData("0 开销", 900.0),
-        RawData("1 开销", 900.0),
-        RawData("其他", 900.0)
-    )) }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFFDE2E4))
+            .padding(WindowInsets.systemBars.asPaddingValues())
+    ) {
 
 
-    Column (
-        modifier = Modifier.fillMaxSize()
-    ){
         Text(
-
-            text = "po",
+            text = "Report \n[${uiState.startYear}/${uiState.startMonth + 1} to ${uiState.endYear}/${uiState.endMonth + 1}]",
             textAlign = TextAlign.Center,
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            color = Color.Black
         )
 
         ExposedDropdownMenuBox(
             modifier = Modifier.fillMaxWidth(),
             expanded = expanded,
             onExpandedChange = { expanded = !expanded }
-
         ) {
-            // 这看起来就像 ComboBox
             TextField(
-                value = selectedText,
+                value = uiState.selectedTarget,
                 onValueChange = {},
                 readOnly = true,
                 label = { Text("Categories") },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier
-                    .fillMaxWidth().padding(8.dp)
+                    .fillMaxWidth()
+                    .padding(8.dp)
                     .menuAnchor()
             )
 
@@ -82,23 +111,51 @@ fun HostelReportScreen(){
                     DropdownMenuItem(
                         text = { Text(selectionOption) },
                         onClick = {
-                            selectedText = selectionOption
+                            viewModel.onTargetChanged(selectionOption)
                             expanded = false
                         }
                     )
                 }
             }
         }
+
         PieChart(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            dataInput = data
-        )
-        YearMonthRangeSelector(
-            modifier = Modifier
-                .fillMaxWidth()
+            dataInput = pieData,
+            wordsInsidePanel = when {
+                uiState.loading -> "Loading..."
+                uiState.error != null -> "Error: ${uiState.error}"
+                uiState.selectedTarget == "Room Occupancy Rate" -> "Times Per\n${uiState.frequency}"
+                uiState.selectedTarget == "Hostel Occupancy Rate" -> "Times Per\n${uiState.frequency}"
+                else -> "${pieData.size}"
+            }
+
 
         )
+
+
+        YearMonthRangeSelector(
+            modifier = Modifier
+                .fillMaxWidth(),
+            onRangeChanged = { startY, startM, endY, endM, mode ->
+                viewModel.onDateRangeChanged(
+                    startYear = startY,
+                    startMonth = startM,
+                    endYear = endY,
+                    endMonth = endM,
+                    frequency = mode
+                )
+            }
+        )
+
+        FourButton(
+            navController = navController,
+            modifier = Modifier
+        )
+
+
     }
+
 }

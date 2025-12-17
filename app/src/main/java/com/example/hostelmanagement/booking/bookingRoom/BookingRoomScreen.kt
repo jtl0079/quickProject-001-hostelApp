@@ -273,7 +273,8 @@ fun Filter(
     snackbarHostState: SnackbarHostState,
     scope: CoroutineScope
 ){
-    val sem = listOf("January","June","October")
+    val sem = listOf("January","February","March","April","May","June"
+        ,"July","August","September","October","November","December")
     val durationMonth= listOf("None","1 Month","2 Month","3 Month","4 Month","5 Month","6 Month",
         "7 Month","8 Month","9 Month","10 Month","11 Month","12 Month")
     val durationYear = listOf("None"," 1 Year "," 2 Year "," 3 Year ")
@@ -307,7 +308,7 @@ fun Filter(
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "Please fill in the information")
             Spacer(modifier = Modifier.height(16.dp))
-            SimpleDropdown(sem,"Sem Check-in",uiState.sem,
+            SimpleDropdown(sem,"Month Check-in",uiState.sem,
                 onTextChange = { bookingRoomViewModel.updateSem(it) })
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -329,7 +330,12 @@ fun Filter(
                         scope.launch {
                             snackbarHostState.showSnackbar("Please add the duration")
                         }
-                    }else{
+                    }else if(uiState.sem ==""){
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Please Select a Month Check-in")
+                        }
+                    }
+                    else{
                         bookingRoomViewModel.onFilterButtonClicked(uiState.sem,uiState.durationYear,uiState.durationMonth)
 
                     }

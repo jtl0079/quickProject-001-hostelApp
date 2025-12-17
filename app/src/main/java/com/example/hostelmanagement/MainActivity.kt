@@ -32,7 +32,12 @@ import com.example.hostelmanagement.maintenance.MaintenanceRecordsScreen
 import com.example.hostelmanagement.maintenance.ItemViewModel
 import com.example.hostelmanagement.maintenance.MaintenanceRequestScreen
 import com.example.hostelmanagement.maintenance.MaintenanceViewModel
+import com.example.hostelmanagement.report.infrastructure.repository.HostelReportRepositoryImpl
 import com.example.hostelmanagement.report.presentation.ui.HostelReportScreen
+import com.example.hostelmanagement.report.presentation.viewmodel.HostelReportViewModel
+import com.example.hostelmanagement.report.presentation.viewmodel.HostelReportViewModelFactory
+import com.example.hostelmanagement.report.usecase.GetReportUseCase
+import com.example.hostelmanagement.report.usecase.SaveReportUseCase
 import com.example.hostelmanagement.ui.theme.HostelManagementTheme
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
@@ -66,9 +71,9 @@ class MainActivity : ComponentActivity() {
                         "start"
                     }
 
-                    // TODO //
-                    val bookingRepo = (application as App).bookingRepository
-                    val qwe = bookingRepo.getAllBooking()
+
+
+
 
                     NavHost(
                         navController = navController,
@@ -118,7 +123,7 @@ class MainActivity : ComponentActivity() {
                                 onHome = {navController.navigate("home")},
                                 onAddItem = {navController.navigate("hostel")},
                                 onBooking = {navController.navigate("booking_hostel")},
-                                onReport = {},
+                                onReport = {navController.navigate("hostel_report")},
                                 onProfile = { navController.navigate("profile") },
                                 onOpenRooms={ hostelId -> navController.navigate("rooms/$hostelId")},
                                 maintenanceViewModel = maintenanceViewModel
@@ -239,7 +244,23 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("hostel_report"){
-                            HostelReportScreen()
+
+                            val bookingRepository = (application as App).bookingRepository
+                            val HostelReportRepositoryImpl = HostelReportRepositoryImpl(bookingRepo = bookingRepository)
+
+                            val getReportUseCase = GetReportUseCase(HostelReportRepositoryImpl)
+                            val saveReportUseCase = SaveReportUseCase(HostelReportRepositoryImpl)
+
+
+                            val viewModel: HostelReportViewModel = viewModel(
+                                factory = HostelReportViewModelFactory(getReportUseCase, saveReportUseCase)
+                            )
+
+
+                            HostelReportScreen(
+                                navController = navController,
+                                viewModel = viewModel
+                            )
                         }
 
                     }

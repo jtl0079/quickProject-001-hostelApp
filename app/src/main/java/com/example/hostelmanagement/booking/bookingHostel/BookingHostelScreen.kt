@@ -126,7 +126,7 @@ fun FourButton(navController: NavController, modifier: Modifier = Modifier){
 
         // Booking Button
         Button(
-            onClick = { },
+            onClick = { navController.navigate("booking_hostel") },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             elevation = ButtonDefaults.buttonElevation(0.dp)
         ) {
@@ -139,7 +139,7 @@ fun FourButton(navController: NavController, modifier: Modifier = Modifier){
 
         // Report Button
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { navController.navigate("hostel_report") },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             elevation = ButtonDefaults.buttonElevation(0.dp)
         ) {

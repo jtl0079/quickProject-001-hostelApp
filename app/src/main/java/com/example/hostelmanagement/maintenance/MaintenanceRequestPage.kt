@@ -94,7 +94,7 @@ fun DisplayEmptyDialog(context: Context, viewModel: ItemViewModel){
 
     LaunchedEffect(issueMessage){
         if(issueMessage){
-            Toast.makeText(currentContext, "Please enter the problem.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(currentContext, "Please select maintenance items or write remarks to proceed.", Toast.LENGTH_SHORT).show()
             viewModel.closeIssueMessage()
         }
     }

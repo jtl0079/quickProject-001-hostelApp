@@ -97,7 +97,6 @@ class MaintenanceViewModel : ViewModel(){
     fun generateDateTime(): String{
         val time = System.currentTimeMillis()
         val s = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-        s.timeZone = TimeZone.getTimeZone("UTC")
         return s.format(Date(time))
     }
 
@@ -114,7 +113,7 @@ class MaintenanceViewModel : ViewModel(){
         maintenanceList: List<MaintenanceItems>
     ) {
 
-        if(maintenanceList.isEmpty()){
+        if(maintenanceList.isEmpty() &&remarks.value.isEmpty()){
             requestEmptyMessage()
 
         }else{

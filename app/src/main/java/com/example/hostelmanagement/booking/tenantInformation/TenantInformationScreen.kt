@@ -53,6 +53,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import kotlinx.coroutines.launch
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.platform.LocalFocusManager
 import kotlinx.coroutines.CoroutineScope
 
@@ -119,7 +120,11 @@ fun TenantInformationScreen(
                         onValueChange = {},
                         readOnly = true,
                         singleLine = true,
-                        modifier = Modifier.weight(1f).fillMaxWidth()
+                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color(0xFFBDBDBD),
+                            unfocusedContainerColor = Color(0xFFBDBDBD)
+                        )
                     )
                     Text(text = " - ", modifier = Modifier.align(Alignment.CenterVertically).padding(4.dp))
                     TextField(
@@ -127,6 +132,10 @@ fun TenantInformationScreen(
                         onValueChange = {},
                         readOnly = true,
                         singleLine = true,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color(0xFFBDBDBD),
+                            unfocusedContainerColor = Color(0xFFBDBDBD)
+                        ),
                         modifier = Modifier.weight(1f).fillMaxWidth()
                     )
                 }
@@ -343,6 +352,10 @@ fun InformationField(
                 readOnly = true,
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color(0xFFBDBDBD),
+                    unfocusedContainerColor = Color(0xFFBDBDBD)
+                ),
                 modifier = Modifier.fillMaxWidth().onFocusChanged {
                     if (it.isFocused) {
                         onFocus()
