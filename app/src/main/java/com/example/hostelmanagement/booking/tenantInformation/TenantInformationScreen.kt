@@ -399,11 +399,18 @@ fun ConfirmSample(
                 TextButton(onClick = {
                     showDialog = false
                     val tenantName = viewModel.uiState.value.tenantName
+                    val tenantId = viewModel.uiState.value.tenantId
                     if (tenantName.isBlank()) {
                         scope.launch {
                             snackbarHostState.showSnackbar("Please the correct Tenant ID")
                         }
-                    } else {
+                    }else if (tenantId != "T001" && tenantId != "T002" && tenantId != "T003" && tenantId != "T004" && tenantId != "T005"
+                        && tenantId != "T006" && tenantId != "T007" && tenantId != "T008" && tenantId != "T009" && tenantId != "T010"){
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Please the correct Tenant ID")
+                        }
+                    }
+                    else {
                         viewModel.addBookingAsync(roomId)
                         scope.launch {
                             snackbarHostState.showSnackbar("Add Booking Successful")

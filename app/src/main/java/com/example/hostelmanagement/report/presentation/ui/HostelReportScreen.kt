@@ -79,7 +79,7 @@ fun HostelReportScreen(
 
 
         Text(
-            text = "Report \n[${uiState.startYear}/${uiState.startMonth + 1} to ${uiState.endYear}/${uiState.endMonth + 1}]",
+            text = "${uiState.frequency}ly Report \n[${uiState.startYear}/${uiState.startMonth + 1} to ${uiState.endYear}/${uiState.endMonth + 1}]",
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth(),

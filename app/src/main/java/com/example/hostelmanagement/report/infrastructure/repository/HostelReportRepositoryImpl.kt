@@ -3,6 +3,8 @@ package com.example.hostelmanagement.report.infrastructure.repository
 import android.util.Log
 import com.example.hostelmanagement.booking.booking.BookingEntity
 import com.example.hostelmanagement.booking.booking.BookingRepository
+import com.example.hostelmanagement.booking.booking.BookingStatus
+import com.example.hostelmanagement.booking.bookingHistory.CancelDetails
 import com.example.hostelmanagement.report.domain.model.HostelReport
 import com.example.hostelmanagement.report.domain.repository.HostelReportRepository
 import com.example.hostelmanagement.report.infrastructure.datasource.HostelDataSource
@@ -206,6 +208,8 @@ suspend fun writeRoomOccupancyToBundle(
        2️⃣ 收集 occupied dates
        ======================= */
     bookings.forEach { booking ->
+        if (booking.bookingStatus == BookingStatus.Cancel) return@forEach
+
         val hostelName = roomHostelMap[booking.roomId] ?: return@forEach
         val key = "$hostelName ${booking.roomId}"
 
