@@ -90,7 +90,7 @@ fun LoginScreen(
                 onValueChange = { viewModel.onPasswordChange(it) },
                 label = {
                     Text(
-                        text="Confirm Password",
+                        text="Password",
                         color = Color(0xFF634035)) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
